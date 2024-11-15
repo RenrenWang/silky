@@ -1,33 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { useRequest } from '../src';
+
+
+type Params={
+  page:number;
+  pageSize:number;
+}
+function editUsername(username: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (Math.random() > 0.5) {
+        resolve();
+      } else {
+        reject(new Error('Failed to modify username'));
+      }
+    }, 1000);
+  });
+}
+
+const service= function(params:Params):Promise<any> {
+  console.log(params,'params')
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (Math.random() > 0.5) {
+        resolve({
+          code:0,
+          data:[]
+        })
+      } else {
+        reject(new Error('Failed to modify username'));
+      }
+    }, 1000);
+  });
+}
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const {data,loading,runSync}=useRequest(service,{
+    manual:true,
+  }); 
+   
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    
+     <a onClick={()=>{
+      runSync({page:1,pageSize:10});
+     }}>getData</a>
+     {loading?<p>Loading...</p>:<p>{JSON.stringify(data)}</p>}
     </>
   )
 }

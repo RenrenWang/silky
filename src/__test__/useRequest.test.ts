@@ -8,22 +8,14 @@ describe('useRequest', () => {
     const res={code:0, data: expectedData }
     const mockService = vi.fn(() => Promise.resolve(res));
 
-    const { result } = renderHook(() => useRequest({
-      service: mockService,
-      options: {
-        manual: true,
-      },
-     }));
+    const { result } = renderHook(() => useRequest<any,any>(mockService));
 
-     // 等待请求完成
+   
+    result.current.runSync(); 
    
     await waitFor(() => {
-      //  // 检查服务是否被调用
-      //  expect(mockService).toHaveBeenCalled();
-      //  // 检查数据是否已更新
       expect(result.current.data).toEqual(res);
-      //  // 断言数据是否符合预期
-      //  expect(result.current.data).toEqual(expectedData);
+      expect(result.current.loading).toEqual(false);
     }, {
       timeout: 300, // 等待5秒
     });
