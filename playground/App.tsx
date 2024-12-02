@@ -1,5 +1,7 @@
 import './App.css'
 import { useRequest } from '../src';
+import { Button, Form } from 'antd';
+import { useState } from 'react';
 
 
 type Params={
@@ -35,18 +37,40 @@ const service= function(params:Params):Promise<any> {
 }
 
 function App() {
-  const {data,loading,runSync}=useRequest(service,{
-    manual:true,
-  }); 
+ 
+  const [form] = Form.useForm();
+  const [loading,setLoading] = useState(false);
+  const onClick = async () => {
+    try {
+     setLoading(true);
+     const res = await form.validateFields()
+     console.log(res);
+   } catch (error) {
+    console.log("error",error);
+   } finally {
+      console.log("finally");
+      setLoading(false);
+   }
    
+
+ }
   return (
-    <>
-    
-     <a onClick={()=>{
-      runSync({page:1,pageSize:10});
-     }}>getData</a>
-     {loading?<p>Loading...</p>:<p>{JSON.stringify(data)}</p>}
-    </>
+    <Form  form={form} component={false}>
+      <Form.Item name="username" noStyle rules={[{
+        validator:( ()=>async (rule, value) => {
+          const res = await service({ page: 1, pageSize: 10 });
+          console.log(res);
+          if (!res) {
+            return Promise.reject('Failed to modify username');
+          
+          }
+          return Promise.resolve();
+      })()}]}>
+        <input type="text" placeholder="Username" />
+      </Form.Item>
+      <Button loading={loading} onClick={onClick}>submit</Button>
+
+    </Form>
   )
 }
 
