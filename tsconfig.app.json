@@ -20,6 +20,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@hooks/*": ["./@hooks/*"],
+      "@hooks": ["./@hooks/index.ts"],
+      "@utils/*": ["./@utils/*"],
+      "@utils": ["./@utils/index.ts"]
+    }
   },
-  "include": ["playground","src"]
+  "include": ["playground","src","@hooks","@utils"]
 }

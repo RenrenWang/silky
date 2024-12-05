@@ -1,4 +1,5 @@
-import createCache, { CacheType } from '@/@utils/cache';
+import {createCache} from '@utils';
+import { CacheType } from '@utils/cache';
 import { useEffect, useMemo } from 'react';
 
 const useCache = <TData>(props?: { type?: CacheType; key?: string; refreshDestroy?: boolean }) => {
@@ -32,9 +33,9 @@ const useCache = <TData>(props?: { type?: CacheType; key?: string; refreshDestro
 
       return null;
     },
-    set: (data: TData) => {
+    set: (data: TData,cacheExpiration?:number) => {
       if (handle) {
-        handle.set(data);
+        handle.set(data,cacheExpiration);
       }
     },
   };

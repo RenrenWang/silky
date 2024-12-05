@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Service } from './typing';
 
-const useLoading = <TData, TParams extends any[]>(service: Service<TData, TParams>, loadingThreshold: number = 0) => {
+const useLoading = <TData, TParams>(service: Service<TData, TParams>, loadingThreshold: number = 0) => {
   const [loading, setLoading] = useState(false);
   const startTime = useRef<number>();
   const requestAnimationFrameRef = useRef<any>();

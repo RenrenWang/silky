@@ -1,81 +1,45 @@
+import {useRequest} from '@hooks';
 import './App.css'
-import { useRequest } from '../src';
 import { Button, Form } from 'antd';
-import { useState } from 'react';
+
 
 
 type Params={
   page:number;
   pageSize:number;
 }
-function editUsername(username: string): Promise<void> {
+
+function editUsername(username: string): Promise<string> {
+  console.log(username);
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (Math.random() > 0.5) {
-        resolve();
+        resolve("Please enter a username");
       } else {
-        reject(new Error('Failed to modify username'));
+        reject('Failed to modify username');
       }
-    }, 1000);
+    }, 200);
   });
 }
 
 
-const useValidator = () => {
-  const service= function(params:Params):Promise<any> {
-    console.log(params,'params')
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (Math.random() > 0.5) {
-          resolve({
-            code:0,
-            data:[]
-          })
-        } else {
-          reject(new Error('Failed to modify username'));
-        }
-      }, 1000);
-    });
-  }
-
-  const check=()=>async (rule, value) => {
-    const res = await service({ page: 1, pageSize: 10 });
-    console.log(res);
-    if (!res) {
-      return Promise.reject('Failed to modify username');
-    
-    }
-    return Promise.resolve();
-  }
-  
-  return { check }
-}
 function App() {
  
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const { check}=useValidator()
-  const onClick = async () => {
-    try {
-     setLoading(true);
-      const res = await form.validateFields()
-      
-     console.log(res);
-   } catch (error) {
-    console.log("error",error);
-   } finally {
-      console.log("finally");
-      setLoading(false);
-   }
-   
+  const { data, loading, run } = useRequest<string, string>(editUsername, {
+    loadingThreshold: 300,
+    cacheKey: 'username',
+    cacheExpiration: 1000 * 3,
+  });
 
- }
+
+  const onClick=()=>{
+     run('3232')
+  }
+  
   return (
     <Form  form={form} component={false}>
-      <Form.Item name="username" noStyle rules={[{
-        validator:check()}]}>
-        <input type="text" placeholder="Username" />
-      </Form.Item>
+       <div>{JSON.stringify(data)}</div>
       <Button loading={loading} onClick={onClick}>submit</Button>
 
     </Form>

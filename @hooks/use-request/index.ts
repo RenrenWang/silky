@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { RequestProps, Service } from './typing';
+import { RequestProps, Result, Service } from './typing';
 import useCache from './use-cache';
 import useLoading from './use-loading';
 
-function useRequest<TData, TParams extends any[]>(
+
+
+function useRequest<TData, TParams extends unknown[]>(
   service: Service<TData, TParams>,
   props?: RequestProps<TData, TParams>,
 ) {
-  const { manual = true, loadingThreshold, cacheKey, cacheType } = props || {};
+  const { manual = true,cacheExpiration, loadingThreshold, cacheKey, cacheType } = props || {};
   const [data, setData] = useState<TData>();
   const lastParams = useRef<TParams>();
   const { get, set } = useCache({ key: cacheKey, type: cacheType });
@@ -22,7 +24,7 @@ function useRequest<TData, TParams extends any[]>(
 
   // afterRequest
   const onAfter = (args: TParams, data: TData) => {
-    set(data);
+    set(data,cacheExpiration);
     setData(data);
     lastParams.current = args;
   };
@@ -38,7 +40,7 @@ function useRequest<TData, TParams extends any[]>(
         setData(data);
         return data;
       }
-
+             
       const res = await newService(...(params || args));
       const newResult = onAfter(params || args, res);
 
@@ -51,11 +53,13 @@ function useRequest<TData, TParams extends any[]>(
   };
 
   const run = async (...args: TParams) => {
-    return await request(...((args || lastParams.current || []) as TParams));
+    const params = args || lastParams.current||[];
+    return  request(...(params as TParams));
   };
 
-  const refresh = (...args: TParams) => {
-    return run(...((args || lastParams.current || []) as TParams));
+
+  const refresh = () => {
+    return run(...(lastParams.current)  as TParams);
   };
 
   useEffect(() => {
@@ -65,7 +69,8 @@ function useRequest<TData, TParams extends any[]>(
     }
   }, [manual]);
 
-  return { data, loading, refresh, run };
+
+  return { data, loading, refresh, run } as unknown as Result<TData, TParams>;
 }
 
 export default useRequest;
