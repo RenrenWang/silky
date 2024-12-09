@@ -1,16 +1,16 @@
-import {createCache} from '@utils';
-import { CacheType } from '@utils/cache';
+import createCache from './cache';
 import { useEffect, useMemo } from 'react';
+import { RequestPluginProps } from './typing';
 
-const useCache = <TData>(props?: { type?: CacheType; key?: string; refreshDestroy?: boolean }) => {
-  const { key, refreshDestroy = true, type } = props || {};
+const useCache = <D,P>(props?: RequestPluginProps<D, P>) => {
+  const { cacheKey:key,cacheExpiration, refreshDestroy = false, cacheType:type='localStorage' } = props?.options || {};
 
   const handle = useMemo(() => {
     if (!key) {
       return null;
     }
 
-    return createCache<TData>({ key, type });
+    return createCache<D>({ key, type });
   }, [key, type]);
 
   useEffect(() => {
@@ -22,20 +22,22 @@ const useCache = <TData>(props?: { type?: CacheType; key?: string; refreshDestro
   }, [handle, refreshDestroy]);
 
   return {
-    get: () => {
+    onBeforeRequest: () => {
       if (handle) {
         const cachedData = handle.get();
 
         if (cachedData) {
-          return cachedData as TData;
+          return {
+            response: cachedData,
+            returnStop: true,
+          };
         }
       }
-
-      return null;
+  
     },
-    set: (data: TData,cacheExpiration?:number) => {
-      if (handle) {
-        handle.set(data,cacheExpiration);
+    onSuccess: (response: D) => {
+      if (handle&&response) {
+         handle.set(response,cacheExpiration);
       }
     },
   };

@@ -12,7 +12,8 @@ const isCacheExpired = <T>(cacheData: CacheData<T>) => {
     return false;
   }
 
-  return cacheData?.expirationTimestamp ? now > cacheData?.expirationTimestamp : true;
+  return cacheData?.expirationTimestamp || cacheData?.expirationTimestamp == 0 ? now > cacheData?.expirationTimestamp : true;
+  
 };
 
 // 从内存缓存中获取数据
@@ -70,8 +71,8 @@ const setInLocalStorage = <T>(requestKey: string, data: T, cacheExpiration: numb
   }
 };
 
-// 优化后的检查缓存是否过期函数，直接比较时间戳
 const createCache = <T>({ type = 'memory', key }: { key: string; type?: CacheType }) => {
+  
   return {
     get: (): T | null => {
       if (type === 'memory') {

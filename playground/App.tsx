@@ -9,39 +9,62 @@ type Params={
   pageSize:number;
 }
 
-function editUsername(username: string): Promise<string> {
-  console.log(username);
+function editUsername({username}:{username?:string}): Promise<any> {
+  console.log("loading....", username);
+
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (Math.random() > 0.5) {
-        resolve("Please enter a username");
-      } else {
-        reject('Failed to modify username');
-      }
-    }, 200);
+      resolve({
+        code: 0,
+        success:true,
+        data: {
+          username: username,
+          email: "test@test.com",
+          phone: "12345678901",
+          avatar: "https://xxx.jpg",
+          updateTime: new Date().toISOString(),
+          role: "admin"
+        }
+      });
+    }, 270);
   });
 }
 
 
 function App() {
- 
   const [form] = Form.useForm();
-  const { data, loading, run } = useRequest<string, string>(editUsername, {
-    loadingThreshold: 300,
-    cacheKey: 'username',
-    cacheExpiration: 1000 * 3,
+  const { data, run, loading } = useRequest(editUsername, {
+    manual: false,
+    cacheKey:"editUsername",
+    loadingDelay: 600,
+    cacheExpiration: 0,
+    params: [
+      {
+        username:'2323'
+      }
+    ]
   });
+  
 
-
-  const onClick=()=>{
-     run('3232')
+  const onClick=async ()=>{
+    try {
+      const result = await run({
+        username: "test",
+      });
+      console.log("onClick=====>success", result);
+    } catch (e) { 
+      console.log("onClick=====>e", e);
+    }finally{
+      console.log("onClick=====>finally");
+    }
   }
   
   return (
-    <Form  form={form} component={false}>
-       <div>{JSON.stringify(data)}</div>
+    <Form form={form} component={false}>
+      <div>
+        {JSON.stringify(data)}
+      </div>
       <Button loading={loading} onClick={onClick}>submit</Button>
-
     </Form>
   )
 }
