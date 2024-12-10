@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { RequestPluginProps } from './typing';
 
 const useLoading = <D, P>({ options, onChangeLoading }: RequestPluginProps<D, P>) => {
