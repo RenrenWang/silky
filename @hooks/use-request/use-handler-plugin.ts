@@ -78,7 +78,7 @@ export const useHandlerPlugin = <D, P extends any[]>(
       }
 
       try {
-        const response = await baseHandler(...finalParams);
+        const response = await baseHandler(...(finalParams as P||[]));
         let finalResponse = response;
 
         // Execute onSuccess hooks
@@ -97,14 +97,13 @@ export const useHandlerPlugin = <D, P extends any[]>(
         // Execute onFinally hooks
         await executePluginHooks("onFinally", null, finalResponse, finalParams);
 
-        return finalResponse;
+        return Promise.resolve(finalResponse);;
 
       } catch (error) {
         // Execute onError and onFinally hooks
         await executePluginHooks("onError", error, finalParams);
         await executePluginHooks("onFinally", error, prevResultRef.current, finalParams);
-
-        throw error;
+        return Promise.reject(error);
       }
     },
     [baseHandler, pluginInstances]

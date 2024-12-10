@@ -33,7 +33,6 @@ const useCache = <D,P>(props?: RequestPluginProps<D, P>) => {
           };
         }
       }
-  
     },
     onSuccess: (response: D) => {
       if (handle&&response) {

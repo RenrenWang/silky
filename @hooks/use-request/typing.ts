@@ -3,7 +3,7 @@ import { CacheType } from "./cache";
 export type Service<D, P extends any[]> = (...args: P) => Promise<D>;
 
 export type RequestProps<D, P extends any[]> = {
-  manual?: boolean;
+  auto?: boolean;
   cacheKey?: string;
   refreshDestroy?: boolean;
   loadingDelay?: number;

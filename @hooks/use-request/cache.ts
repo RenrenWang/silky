@@ -71,6 +71,32 @@ const setInLocalStorage = <T>(requestKey: string, data: T, cacheExpiration: numb
   }
 };
 
+export const clearMemory=(key?:string|string[])=>{
+  if(!key){
+    memoryCache.clear();
+    return;
+  }
+  
+  if(Array.isArray(key)){
+    key.forEach(item=>memoryCache.delete(item));
+  }
+
+  memoryCache.delete(key as string)
+}
+
+export const clearLocalStorage=(key?:string|string[])=>{
+  if(!key){
+    localStorage.clear();
+    return;
+  }
+
+  if(Array.isArray(key)){
+    key.forEach(item=>localStorage.removeItem(item));
+  }
+
+  localStorage.removeItem(key as string)
+}
+
 const createCache = <T>({ type = 'memory', key }: { key: string; type?: CacheType }) => {
   
   return {

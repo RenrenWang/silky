@@ -26,7 +26,7 @@ function editUsername({username}:{username?:string}): Promise<any> {
           role: "admin"
         }
       });
-    }, 270);
+    }, 100);
   });
 }
 
@@ -34,10 +34,8 @@ function editUsername({username}:{username?:string}): Promise<any> {
 function App() {
   const [form] = Form.useForm();
   const { data, run, loading } = useRequest(editUsername, {
-    manual: false,
-    cacheKey:"editUsername",
-    loadingDelay: 600,
-    cacheExpiration: 0,
+    auto: true,
+    loadingDelay: 300,
     params: [
       {
         username:'2323'

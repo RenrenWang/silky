@@ -21,11 +21,11 @@ function useRequest<D, P extends any[]>(service: Service<D, P>, options?: Reques
   }
   
   useEffect(() => {
-    if (!options?.manual) {
+    if (options?.auto) {
       // @ts-ignore
       run();
     }
-  }, [options?.manual]);
+  }, [options?.auto]);
 
   return {
     run,

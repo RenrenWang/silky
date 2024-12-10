@@ -3,46 +3,41 @@ import { RequestPluginProps } from './typing';
 
 const useLoading = <D, P>({ options, onChangeLoading }: RequestPluginProps<D, P>) => {
   const { loadingDelay } = options || {};
-  const startTime = useRef<number>();
-  const requestAnimationFrameRef = useRef<any>();
-  const checkLoading = () => {
-
-    if (startTime?.current) {
-      const elapsedTime = Date.now() - startTime?.current;
-
-      if (loadingDelay && elapsedTime > loadingDelay) {
-        onChangeLoading(true);
-        cancelAnimationFrame(requestAnimationFrameRef.current);
-      } else {
-        requestAnimationFrameRef.current = requestAnimationFrame(checkLoading);
-      }
-    }
-  };
-
-  const clear = () => {
-    if (requestAnimationFrameRef.current) {
-      cancelAnimationFrame(requestAnimationFrameRef.current);
-    }
-  };
+  const end = useRef(false);
+  const timerOut = useRef<any>(undefined);
 
   useEffect(() => {
     return () => {
-      clear();
+      if (timerOut.current) {
+        clearTimeout(timerOut.current)
+      }
     };
   }, []);
 
   return {
     onBeforeRequest: () => {
-      startTime.current = Date.now();
+      end.current = false;
+
       if (loadingDelay) {
-        checkLoading();
-      }else{
+
+        timerOut.current = setTimeout(() => {
+          if (!end.current) {
+            onChangeLoading(true)
+          }
+
+        }, loadingDelay)
+
+      } else {
         onChangeLoading(true)
       }
     },
     onFinally: () => {
+      end.current = true;
+      if (timerOut.current) {
+        clearTimeout(timerOut.current)
+      }
+  
       onChangeLoading(false);
-      clear();
     },
   }
 };
