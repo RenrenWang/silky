@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { RequestPluginProps } from './typing';
 
-const useLoading = <D, P>({ options, onChangeLoading }: RequestPluginProps<D, P>) => {
+const useLoading = <D, P extends any[]>({ options, onChangeLoading }: RequestPluginProps<D, P>) => {
   const { loadingDelay } = options || {};
   const end = useRef(false);
   const timerOut = useRef<any>(undefined);
@@ -17,7 +17,10 @@ const useLoading = <D, P>({ options, onChangeLoading }: RequestPluginProps<D, P>
   return {
     onBeforeRequest: () => {
       end.current = false;
-
+      if (timerOut.current) {
+        clearTimeout(timerOut.current)
+      }
+      
       if (loadingDelay) {
 
         timerOut.current = setTimeout(() => {

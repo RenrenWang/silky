@@ -14,18 +14,19 @@ function editUsername({username}:{username?:string}): Promise<any> {
 
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve({
-        code: 0,
-        success:true,
-        data: {
-          username: username,
-          email: "test@test.com",
-          phone: "12345678901",
-          avatar: "https://xxx.jpg",
-          updateTime: new Date().toISOString(),
-          role: "admin"
-        }
-      });
+      // reject({
+      //   code: 0,
+      //   success:true,
+      //   data: {
+      //     username: username,
+      //     email: "test@test.com",
+      //     phone: "12345678901",
+      //     avatar: "https://xxx.jpg",
+      //     updateTime: new Date().toISOString(),
+      //     role: "admin"
+      //   }
+      // });
+      reject(new Error("Simulated request failure"))
     }, 100);
   });
 }
@@ -36,6 +37,8 @@ function App() {
   const { data, run, loading } = useRequest(editUsername, {
     auto: true,
     loadingDelay: 300,
+    // throttleTime:1000*7,
+    ready:true,
     params: [
       {
         username:'2323'

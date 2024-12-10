@@ -8,6 +8,11 @@ export type RequestProps<D, P extends any[]> = {
   refreshDestroy?: boolean;
   loadingDelay?: number;
   cacheExpiration?: number;
+  throttleTime?: number;
+  debounceTime?: number;
+  retryInterval?: number;
+  ready?: boolean;
+  maxRetries?: number;
   params?: P;
   cacheType?: CacheType;
   onSuccess?: (data: D) => void;
@@ -28,17 +33,12 @@ export type Result<D, P extends any[]> = {
 //   data: T;
 //   message?: string;
 // };
-export type RequestPluginProps<D,P> = {
+export type RequestPluginProps<D,P extends any[]> = {
   options: RequestProps<D, P>;
   onChangeLoading: (loading:boolean)=>void;
 }
 
-export type RequestPlugin<D, P> = (
-  {
-    options,
-    onChangeLoading
-  }: RequestPluginProps<D,P>
-) => {
+export interface RequestPluginReturn<D, P extends any[]>{
     onBeforeRequest?: ({
     prevResult,
     prevParams
@@ -57,6 +57,6 @@ export type RequestPlugin<D, P> = (
   onSuccess?: (response: D, config?: P) => D | Promise<D> | void;
   onError?: (error: any, config?: P) => void;
   onFinally?: (responseOrError: any,response?:D, config?: P) =>void;
-  shouldStopPropagation?: boolean;
-  loading?: boolean;
-};
+}
+
+export type  RequestPlugin<D,P extends any[]>=(props:RequestPluginProps<D, P>)=>RequestPluginReturn<D, P>;
