@@ -36,9 +36,9 @@ function App() {
   const [form] = Form.useForm();
   const { data, run, loading } = useRequest(editUsername, {
     auto: true,
-    loadingDelay: 300,
+    // loadingDelay: 300,
+    retry:true,
     // throttleTime:1000*7,
-    ready:true,
     params: [
       {
         username:'2323'

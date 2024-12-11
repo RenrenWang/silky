@@ -11,7 +11,7 @@ export type RequestProps<D, P extends any[]> = {
   throttleTime?: number;
   debounceTime?: number;
   retryInterval?: number;
-  ready?: boolean;
+  retry?: boolean;
   maxRetries?: number;
   params?: P;
   cacheType?: CacheType;
@@ -54,8 +54,8 @@ export interface RequestPluginReturn<D, P extends any[]>{
     response?: D;
     returnStop?: boolean;
   }> | void;
-  onSuccess?: (response: D, config?: P) => D | Promise<D> | void;
-  onError?: (error: any, config?: P) => void;
+  onSuccess?: (response: D, config: P) => D | Promise<D> | void;
+  onError?: (error: any, config: P,request:(params: P) =>  D | Promise<D> | void) => void;
   onFinally?: (responseOrError: any,response?:D, config?: P) =>void;
 }
 

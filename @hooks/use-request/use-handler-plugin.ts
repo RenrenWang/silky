@@ -102,7 +102,7 @@ export const useHandlerPlugin = <D, P extends any[]>(
       } catch (error) {
         // Execute onError and onFinally hooks
 
-        await executePluginHooks("onError", error, finalParams!);
+        await executePluginHooks("onError", error, finalParams!,request);
         await executePluginHooks("onFinally", error, prevResultRef.current, finalParams!);
         return Promise.reject(error);
       }
