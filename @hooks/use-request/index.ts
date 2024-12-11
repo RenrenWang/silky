@@ -5,14 +5,16 @@ import useCache from "./use-cache";
 import { useEffect } from "react";
 import useDebounceThrottle from "./use-debounce-throttle";
 import { useRetryPlugin } from "./use-retry";
+import useCancel from "./use-cancel";
 
 function useRequest<D, P extends any[]>(service: Service<D, P>, options?: RequestProps<D, P>) {
   
-  const { data, request, loading, prevParamsRef } = useHandlerPlugin<D, P>(service, [  
+  const { data,cancel, request, loading, prevParamsRef } = useHandlerPlugin<D, P>(service, [  
+    useLoading,
     useDebounceThrottle,
     useCache,
-    useLoading,
-    useRetryPlugin
+    useRetryPlugin,
+    useCancel,
   ], options as RequestProps<D, P>);
 
   const run = async (...args: P) => {
@@ -31,12 +33,13 @@ function useRequest<D, P extends any[]>(service: Service<D, P>, options?: Reques
       run();
     }
   }, []);
-
+ 
   return {
     run,
     data,
     loading,
-    refresh
+    refresh,
+    cancel
   };
 
 }

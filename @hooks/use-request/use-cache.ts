@@ -2,8 +2,8 @@ import createCache from './cache';
 import { useEffect, useMemo } from 'react';
 import { RequestPluginProps } from './typing';
 
-const useCache = <D,P>(props?: RequestPluginProps<D, P>) => {
-  const { cacheKey:key,cacheExpiration, refreshDestroy = false, cacheType:type='localStorage' } = props?.options || {};
+const useCache = <D,P extends any[]>(props?: RequestPluginProps<D, P>) => {
+  const { cacheKey:key,cacheExpiration, refreshDestroy = false, cacheType:type='memory' } = props?.options || {};
 
   const handle = useMemo(() => {
     if (!key) {

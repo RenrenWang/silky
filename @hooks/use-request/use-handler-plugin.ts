@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import {  RequestPlugin, RequestPluginReturn, RequestProps } from "./typing";
+import { RequestPlugin, RequestPluginReturn, RequestProps } from "./typing";
 
 export const useHandlerPlugin = <D, P extends any[]>(
   baseHandler: (...config: P) => Promise<D>,
@@ -14,7 +14,7 @@ export const useHandlerPlugin = <D, P extends any[]>(
   const pluginInstances = plugins.map((usePlugin) =>
     usePlugin({
       options,
-      onChangeLoading: (loading)=>setLoading(loading),// TODO forward
+      onChangeLoading: (loading) => setLoading(loading) // TODO forward
     })
   );
 
@@ -25,24 +25,26 @@ export const useHandlerPlugin = <D, P extends any[]>(
   ) => {
     for (const plugin of pluginInstances) {
       const hook = plugin[hookName];
-  
+
       if (typeof hook === "function") {
         // 明确告诉 TypeScript，hook 是函数类型
-        await (hook as (...args: Parameters<NonNullable<typeof hook>>) => any)(...args);
+        await (hook as (...args: Parameters<NonNullable<typeof hook>>) => any)(
+          ...args
+        );
       }
     }
   };
-  
 
   const executeBeforeRequestHooks = async (params: P) => {
-    let finalParams = Array.isArray(params) && params?.length ? params : prevParamsRef.current;
+    let finalParams =
+      Array.isArray(params) && params?.length ? params : prevParamsRef.current;
     let shouldStop = false;
 
     for (const plugin of pluginInstances) {
       if (plugin.onBeforeRequest) {
         const result = await plugin.onBeforeRequest({
           prevParams: finalParams,
-          prevResult: prevResultRef.current,
+          prevResult: prevResultRef.current
         });
 
         if (result) {
@@ -53,7 +55,7 @@ export const useHandlerPlugin = <D, P extends any[]>(
 
             if (shouldStop) {
               setData(result.response);
-              await executePluginHooks("onFinally", null, result.response, finalParams!);
+              await executePluginHooks("onFinally");
               return { shouldStop, finalParams };
             }
           }
@@ -70,22 +72,27 @@ export const useHandlerPlugin = <D, P extends any[]>(
 
   const request = useCallback(
     async (params: P) => {
-      const { shouldStop, finalParams } = await executeBeforeRequestHooks(params);
+      const { shouldStop, finalParams } = await executeBeforeRequestHooks(
+        params
+      );
 
       prevParamsRef.current = finalParams;
 
       if (shouldStop) {
         return prevResultRef.current;
       }
-
+      console.log("finalParams",finalParams)
       try {
-        const response = await baseHandler(...(finalParams as P || []));
+        const response = await baseHandler(...((finalParams as P) || []));
         let finalResponse = response;
 
         // Execute onSuccess hooks
         for (const plugin of pluginInstances) {
           if (plugin.onSuccess) {
-            const processedResponse = await plugin.onSuccess(finalResponse, finalParams!);
+            const processedResponse = await plugin.onSuccess(
+              finalResponse,
+              finalParams!
+            );
             if (processedResponse) {
               finalResponse = processedResponse;
             }
@@ -94,26 +101,35 @@ export const useHandlerPlugin = <D, P extends any[]>(
 
         setData(finalResponse);
         prevResultRef.current = finalResponse;
-
-        // Execute onFinally hooks
-        await executePluginHooks("onFinally", null, finalResponse, finalParams!);
+        options?.onSuccess?.(finalResponse);
 
         return Promise.resolve(finalResponse);
       } catch (error) {
         // Execute onError and onFinally hooks
+        options?.onError?.(error as any);
 
-        await executePluginHooks("onError", error, finalParams!,request);
-        await executePluginHooks("onFinally", error, prevResultRef.current, finalParams!);
+        await executePluginHooks("onError", error, finalParams!, request);
+
         return Promise.reject(error);
+      } finally {
+        options?.onFinally?.();
+        executePluginHooks("onFinally");
       }
     },
     [baseHandler, pluginInstances]
   );
 
+
+   // 取消所有请求
+   const cancel = () => {
+     executePluginHooks("cancel");
+  };
+
   return {
     request,
     data,
     loading,
-    prevParamsRef,
+    cancel,
+    prevParamsRef
   };
 };

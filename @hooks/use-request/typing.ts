@@ -2,7 +2,7 @@ import { CacheType } from "./cache";
 
 export type Service<D, P extends any[]> = (...args: P) => Promise<D>;
 
-export type RequestProps<D, P extends any[]> = {
+export type RequestProps<D, P> = {
   auto?: boolean;
   cacheKey?: string;
   refreshDestroy?: boolean;
@@ -33,12 +33,12 @@ export type Result<D, P extends any[]> = {
 //   data: T;
 //   message?: string;
 // };
-export type RequestPluginProps<D,P extends any[]> = {
+export type RequestPluginProps<D,P=any> = {
   options: RequestProps<D, P>;
   onChangeLoading: (loading:boolean)=>void;
 }
 
-export interface RequestPluginReturn<D, P extends any[]>{
+export interface RequestPluginReturn<D=any, P=any>{
     onBeforeRequest?: ({
     prevResult,
     prevParams
@@ -55,8 +55,9 @@ export interface RequestPluginReturn<D, P extends any[]>{
     returnStop?: boolean;
   }> | void;
   onSuccess?: (response: D, config: P) => D | Promise<D> | void;
-  onError?: (error: any, config: P,request:(params: P) =>  D | Promise<D> | void) => void;
-  onFinally?: (responseOrError: any,response?:D, config?: P) =>void;
+  onError?: (error: any, config: P,request:(params: P) =>  D | Promise<D|undefined> | void) => void;
+  onFinally?: () =>void;
+  cancel?: () => void;
 }
 
 export type  RequestPlugin<D,P extends any[]>=(props:RequestPluginProps<D, P>)=>RequestPluginReturn<D, P>;

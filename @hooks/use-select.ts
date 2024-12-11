@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import type { RequestProps, Service } from './use-request';
 import useRequest from './use-request';
+import { RequestProps, Service } from './use-request/typing';
 
 const useSelect = <TData, TParams extends any[]>(
   service: Service<TData, TParams>,
@@ -13,7 +13,6 @@ const useSelect = <TData, TParams extends any[]>(
   const { transform, optionLabel, optionValue, ...rest } = props;
 
   const { data, loading, refresh, run }: any = useRequest(service, {
-    manual: true,
     ...rest,
   });
 
