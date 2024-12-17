@@ -3,6 +3,7 @@ import "./App.css";
 import { FormProvider, useForm } from "react-hook-form";
 import FormItem from "./form-item";
 import { useEffect } from "react";
+import { Input } from "@mui/joy";
 
 function App() {
   const methods = useForm<any>({
@@ -11,7 +12,7 @@ function App() {
       type:null
     }
   });
-  
+
   const { handleSubmit, setValue, watch} = methods;
 
   const onSubmit = data => {
@@ -73,6 +74,14 @@ function App() {
           }}
         >
           <Radio.Group options={["apple", "orange", "banana"]} />
+        </FormItem>
+        <FormItem
+          name="joyInput"
+          rules={{
+            required: "This is required."
+          }}
+        >
+         <Input   />
         </FormItem>
 
         <button type="submit">Submit</button>

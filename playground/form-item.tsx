@@ -1,4 +1,5 @@
 import { ErrorMessage } from "@hookform/error-message";
+import classNames from "classnames";
 import React from "react";
 import { Controller, RegisterOptions, useFormContext } from "react-hook-form";
 
@@ -24,9 +25,9 @@ const FormItem = (props: FormItemProps) => {
       rules={rules}
       render={({ field }) => {
         return (
-          <div>
+          <div  className={classNames('form-item')}>
             {React.cloneElement(children, { ...field, ...rest })}
-            <ErrorMessage errors={errors} name={field?.name} render={({ message }) => <span style={{color:'red'}}>{message}</span>}/>
+            <ErrorMessage errors={errors} name={field?.name} render={({ message }) => <span className="form-item-error">{message}</span>}/>
           </div>
         );
       }}
