@@ -1,48 +1,79 @@
-import {  Input } from "antd";
+import { Radio, Select } from "antd";
 import "./App.css";
-import {  FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import FormItem from "./form-item";
-import Autocomplete from '@mui/joy/Autocomplete';
+import { useEffect } from "react";
 
 function App() {
   const methods = useForm<any>({
-    mode: "all"
+    mode: "all",
+    defaultValues:{
+      type:null
+    }
   });
-  const {
-    handleSubmit,
-    setValue,
-  } = methods;
+  
+  const { handleSubmit, setValue, watch} = methods;
 
   const onSubmit = data => {
-    console.log(data); // log form field values
+    console.log(data); 
   };
 
   const onClick = () => {
     setValue("firstName", "");
   };
 
+  const type = watch("type");
+  const radio = watch("radio");
+
+  useEffect(
+    () => {
+      if(type){
+        setValue("radio", type);
+      }
+    },
+    [type]
+  );
+
+
+
+  
+  useEffect(
+    () => {
+      if(type!==radio){
+        setValue("type", null);
+      }
+    },
+    [radio]
+  );
+
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormItem
-          name="firstName"
+          name="type"
           rules={{
-            required: "This is required.",
+            required: "This is required."
           }}
-          defaultValue=""
+          defaultValue={"apple"}
         >
-          <Autocomplete options={['Option 1', 'Option 2']} />
+          <Select
+            options={[
+              { label: "Apple", value: "apple" },
+              { label: "Orange", value: "orange" },
+              { label: "Banana", value: "banana" }
+            ]}
+          />
         </FormItem>
 
         <FormItem
-          name="lastName"
+          name="radio"
           rules={{
-            required: "This is required.",
+            required: "This is required."
           }}
         >
-          <Input />
+          <Radio.Group options={["apple", "orange", "banana"]} />
         </FormItem>
-     
 
         <button type="submit">Submit</button>
       </form>
