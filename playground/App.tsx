@@ -1,89 +1,55 @@
-import {useRequest} from '@hooks';
-import './App.css'
-import { Button, Form } from 'antd';
-import axios from 'axios';
-
-
-
-type Params={
-  page:number;
-  pageSize:number;
-}
-
-function editUsername({username}:{username:string},config?:any): Promise<any> {
- console.log("config",username, config);
-  return axios.get('/api/pay/list',config)
-  // console.log("loading....", username);
-
-  // return new Promise((resolve, reject) => {
-  //   setTimeout(() => {
-  //     // reject({
-  //     //   code: 0,
-  //     //   success:true,
-  //     //   data: {
-  //     //     username: username,
-  //     //     email: "test@test.com",
-  //     //     phone: "12345678901",
-  //     //     avatar: "https://xxx.jpg",
-  //     //     updateTime: new Date().toISOString(),
-  //     //     role: "admin"
-  //     //   }
-  //     // });
-  //     //有五分之一的几率会报错
-  //     if(Math.random()<0.8){
-  //       reject(new Error("simulated request failure"))
-  //     }
-  //     resolve({
-  //       code: 0,
-  //       success:true,
-  //       data: {
-  //         username: username,
-  //         email: "test@test.com",
-  //         phone: "12345678901",
-  //         avatar: "https://xxx.jpg",
-  //         updateTime: new Date().toISOString(),
-  //         role: "admin"
-  //       }
-  //     });
-  //   }, 1000);
-  // });
-}
-
+import {  Input } from "antd";
+import "./App.css";
+import {  FormProvider, useForm } from "react-hook-form";
+import FormItem from "./form-item";
+import Autocomplete from '@mui/joy/Autocomplete';
 
 function App() {
-  const [form] = Form.useForm();
-  const { data, run,cancel, loading } = useRequest(editUsername, {
-    loadingDelay: 300,
-    cacheKey:'editUsername',
-    debounceTime:300,
-    onSuccess: (data: any) => {
-      console.log("onSuccess=====>", data);
-    },
+  const methods = useForm<any>({
+    mode: "all"
   });
-  
+  const {
+    handleSubmit,
+    setValue,
+  } = methods;
 
-  const onClick=async ()=>{
-    try {
-      const result = await run({
-        username: "test",
-      });
-      console.log("onClick=====>success", result);
-    } catch (e) { 
-      console.log("onClick=====>e", e);
-    }finally{
-      console.log("onClick=====>finally");
-    }
-  }
-  
+  const onSubmit = data => {
+    console.log(data); // log form field values
+  };
+
+  const onClick = () => {
+    setValue("firstName", "");
+  };
+
   return (
-    <Form form={form} component={false}>
-      <div>
-        {JSON.stringify(data)}
-      </div>
-      <Button loading={loading} onClick={onClick}>submit</Button>
-      <Button onClick={cancel}>cancel</Button>
-    </Form>
-  )
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormItem
+          name="firstName"
+          rules={{
+            required: "This is required.",
+          }}
+          defaultValue=""
+        >
+          <Autocomplete options={['Option 1', 'Option 2']} />
+        </FormItem>
+
+        <FormItem
+          name="lastName"
+          rules={{
+            required: "This is required.",
+          }}
+        >
+          <Input />
+        </FormItem>
+     
+
+        <button type="submit">Submit</button>
+      </form>
+
+      <button onClick={onClick}>change lastName</button>
+    </FormProvider>
+  );
 }
 
-export default App
+export default App;
