@@ -4,6 +4,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import FormItem from "./form-item";
 import { useEffect } from "react";
 import { Input } from "@mui/joy";
+import NumberInput from "./number-input";
 
 function App() {
   const methods = useForm<any>({
@@ -84,6 +85,10 @@ function App() {
          <Input   />
         </FormItem>
 
+        <FormItem name="amount">
+          <NumberInput/>
+        </FormItem>
+        
         <button type="submit">Submit</button>
       </form>
 
