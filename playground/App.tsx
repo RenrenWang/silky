@@ -2,9 +2,10 @@ import { Radio, Select } from "antd";
 import "./App.css";
 import { FormProvider, useForm } from "react-hook-form";
 import FormItem from "./form-item";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@mui/joy";
 import NumberInput from "./number-input";
+import useImagesPreloader from "@hooks/use-images-preloader";
 
 function App() {
   const methods = useForm<any>({
@@ -13,14 +14,17 @@ function App() {
       type:null
     }
   });
-
+  // useImagesPreloader([
+  //   'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960'
+  // ])
   const { handleSubmit, setValue, watch} = methods;
-
+  const [show,setShow]=useState(false);
   const onSubmit = data => {
     console.log(data); 
   };
 
   const onClick = () => {
+    setShow((show)=>!show)
     setValue("firstName", "");
   };
 
@@ -51,6 +55,7 @@ function App() {
 
   return (
     <FormProvider {...methods}>
+      {show?<div className="bg" style={{width:1280,height:960,backgroundImage:'url(http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960)'}}></div>:null}
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormItem
           name="type"
