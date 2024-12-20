@@ -4,10 +4,9 @@ import { Input } from "antd";
 const NumberInput=({onChange,...rest}:any)=>{
 
     const inputProps=useNumberInput({
-        initialValue:"-20000.232",
-        decimalPlaces:18,
-        allowZero:false,
-       onChange
+        initialValue:"-20000.23266666",
+        decimalPlaces:3,
+        onChange,
     });
 
     return <Input {...rest} {...inputProps}/>
