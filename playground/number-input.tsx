@@ -4,7 +4,7 @@ import { Input } from "antd";
 const NumberInput=({onChange,...rest}:any)=>{
 
     const inputProps=useNumberInput({
-        initialValue:"-20000.23266666",
+        initialValue:"-1234",
         decimalPlaces:3,
         onChange,
     });
