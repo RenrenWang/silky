@@ -1,105 +1,79 @@
-import { Radio, Select } from "antd";
+import {  Radio, Select } from "antd";
 import "./App.css";
 import { FormProvider, useForm } from "react-hook-form";
 import FormItem from "./form-item";
-import { useEffect, useState } from "react";
-import { Input } from "@mui/joy";
-import NumberInput from "./number-input";
-import useImagesPreloader from "@hooks/use-images-preloader";
+import InputRadio from "./items";
+import * as Yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+// Define a Yup schema with multiple fields
+const schema = Yup.object().shape({
+  inputRadio: Yup.object().shape({
+    radio: Yup.number().required("radio is required."),
+    input: Yup.string().trim().required("input is required.").email("input is not valid email."),
+  }).required("This is required."),
+  name: Yup.lazy(value=>{
+    if (typeof value === "string") {
+      return Yup.string().trim().required("name is required.");
+    }if(typeof value === "object"){
+      return Yup.object().shape({
+        value: Yup.string().trim().required("label is required.")
+      }).required("name is required.")
+    }
+    return Yup.array().of(Yup.object().shape({
+      label: Yup.string().trim().required("label is required."),
+    })).required("name is required.");
+  }),
+
+  // Yup.object().shape({
+  //   label: Yup.string().trim().required("label is required.")
+  // }).required("name is required."),
+});
 
 function App() {
   const methods = useForm<any>({
     mode: "all",
-    defaultValues:{
-      type:null
-    }
+    resolver: yupResolver(schema),
   });
-  // useImagesPreloader([
-  //   'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960'
-  // ])
-  const { handleSubmit, setValue, watch} = methods;
-  const [show,setShow]=useState(false);
+
+  const { handleSubmit} = methods;
+
   const onSubmit = data => {
     console.log(data); 
   };
 
-  const onClick = () => {
-    setShow((show)=>!show)
-    setValue("firstName", "");
-  };
-
-  const type = watch("type");
-  const radio = watch("radio");
-
-  useEffect(
-    () => {
-      if(type){
-        setValue("radio", type);
-      }
-    },
-    [type]
-  );
-
-
-
-  
-  useEffect(
-    () => {
-      if(type!==radio){
-        setValue("type", null);
-      }
-    },
-    [radio]
-  );
 
 
   return (
     <FormProvider {...methods}>
-      {show?<div className="bg" style={{width:1280,height:960,backgroundImage:'url(http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960)'}}></div>:null}
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormItem
-          name="type"
+          name="name"
           rules={{
             required: "This is required."
           }}
-          defaultValue={"apple"}
         >
           <Select
+         labelInValue
             options={[
-              { label: "Apple", value: "apple" },
+              { label: "Apple", value: "" },
               { label: "Orange", value: "orange" },
               { label: "Banana", value: "banana" }
             ]}
           />
         </FormItem>
 
-        <FormItem
-          name="radio"
-          rules={{
-            required: "This is required."
-          }}
+         <FormItem
+          name="inputRadio"
         >
-          <Radio.Group options={["apple", "orange", "banana"]} />
+          <InputRadio/>
         </FormItem>
-        <FormItem
-          name="joyInput"
-          rules={{
-            required: "This is required."
-          }}
-        >
-         <Input   />
-        </FormItem>
-
-        <FormItem name="amount">
-          <NumberInput/>
-        </FormItem>
-        
         <button type="submit">Submit</button>
       </form>
 
-      <button onClick={onClick}>change lastName</button>
     </FormProvider>
   );
 }
 
 export default App;
+

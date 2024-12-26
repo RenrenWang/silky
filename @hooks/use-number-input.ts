@@ -102,17 +102,21 @@ function useNumberInput({
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (onChange) {
-      onChange(value.replace(/,/g, "")); // Pass unformatted value to onChange
-    }
-  }, [value, onChange]);
+    setValue(formatValue(String(initialValue)))
+  }, [initialValue]);
 
   // Input handlers
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const rawValue = e.target.value;
       const validatedValue = validateInput(rawValue);
-      setValue(validatedValue);
+      
+      setValue(formatValue(validatedValue));
+
+      if(onChange){
+        onChange?.(validatedValue.replace(/,/g, ""))
+      }
+
     },
     [validateInput]
   );
@@ -120,7 +124,7 @@ function useNumberInput({
   const handleFocus = useCallback(
     (e: React.FocusEvent<HTMLInputElement>) => {
       if (onFocus) onFocus(e);
-      setValue(value.replace(/,/g, "")); // Remove formatting on focus
+       setValue(value.replace(/,/g, "")); // Remove formatting on focus
     },
     [value, onFocus]
   );
